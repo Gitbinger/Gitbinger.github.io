@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>华周测控-读码器</title>    
+		
+    <link rel="stylesheet" href="style.css" type="text/css" charset="UTF-8" />
+    <link rel="stylesheet" href="start.css" type="text/css" charset="UTF-8"/>
+    <script type="text/javascript" src="start.js"></script>
+</head>
+<body onload="start_time();createImageLayer(1);get_cfg()">
+<div id="sidebar">
+    <h1>华周测控</h1>
+    <h2>读码器</h2>
+
+    <div id="menu">
+		<input type="button" class="className" value="使用说明" onclick="openwin(1)" />
+		<br/>
+		<br/>
+		<input type="button" class="className" value="设置" onclick="openwin(0)" />
+		<br/>
+		<br/>
+        <input type="button" class="className" id="bttnRoi" value="ROI" onclick="EditRoi_ButtonEvent()" />
+        <br />
+        <br />
+		<input type="button" class="className" value="保存" onclick="set_cfg()" />
+		<br/>
+		<br />
+		<input type="button" class="className" value="升级" onclick="upload()" />
+		
+		<br/>
+    </div>
+   <div id="down">
+        <p>&copy; The <a href="http://www.hztest.com.cn/" target="_blank" >读码器</a> | Design by <a href="http://www.hztest.com.cn/" target="_blank">HZTEST</a></p>
+    </div>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <h3>版本信息:</h3>
+    <p>Build On %BUILT_DATE%</p>
+    <h3>系统时间：</h3>
+    <p id="sys_time"></p>
+    <h3>相机帧率:</h3>
+    <p id="info">-</p>
+</div>
+
+<div id="content">
+  <!--  <h1>显示</h1>-->
+    <!--<h2>界面</h2>-->
+
+
+    <div id="webcam">
+        <canvas id="canvasRoi" width="640" height="480" >
+    </div>
+        <br/>
+      <div id ="div_select">
+       <strong style=" font-family:微软雅黑; font-size:15px;">解码结果：</strong>
+       <input id = "codetext" type="text" style="width: 100%" value=""  />
+        <br/>
+		<br/>
+				<select id="runMode" class="className" style="height:40px;width:100px" onchange="RunModeChangle()">
+					<option value='modeSoftTrigger'>软件触发</option>
+					<option value='modeRealtime'>实时图像</option>
+					<option value='modeHardTrigger'>硬件触发</option>
+					
+				</select>				
+			
+				<select id="switchLed" class="className" style="height:40px;width:100px;text-align:center;text-align-last:center" onchange='main(9)'>
+					<option value='openLed'>开灯</option>
+					<option value='closeLed'>关灯</option>
+					<option value='flashLed'>闪光</option>					
+				</select>   	
+				<!--<input type="button" style="height:40px;width:120px" class="className" id="switchLed" value="开灯" onclick="main(9)" />	 -->				
+				<input type="button" style="height:40px;width:100px" class="className" value="解码" onclick="main(3)"/>
+	</div>
+        <br/>
+        
+        <br/> 
+        
+    	<hr />
+			<strong style=" font-family:微软雅黑;font-size:15px;color:red">注意事项：</strong>
+			<p style="font-family:times;color:red">
+			<br/>	
+			网页端进行控制或修改参数会影响读码器的运行状态，如果您正在使用RS232或以太网的Socket进行对读码器控制，
+			同时操作网页可能会导致你的应用无法正常使用，在使用网页操控读码器后应用端务必重新加载参数重新配置读码器，
+			确保设备正常运行。<br/>
+			操作时需要注意以下几点：<br/>
+		1、如显示“等待拍照图像”，需要切换至“实时图像”模式或在非“实时图像”模式下触发解码即可<br/>
+    	2、如果在非“实时图像”模式下，图像只有在解码的时候才会刷新。<br/>
+    	3、在闪光模式开启并打开“实时图像”模式可以手动点击解码，但LED不会闪光，若要闪光，需切换为非"实时图像"模式。<br/>
+    	4、在RS232或Socket端修改或配置参数，网页端不会立即刷新，需手动刷新，例如socket端关闭LED灯，网页端开关灯按钮不会刷新。<br/>
+			</p>
+			<hr />          
+        
+        
+        
+    <div id ="div_select">
+    <strong class="char">码制选择：</strong>
+    <br/>
+    <label><input name="code" type="checkbox" value="ean8" />EAN-8</label>
+    <label><input name="code" type="checkbox" value="upce" />UPC-E</label>
+  	<label><input name="code" type="checkbox" value="upca" />UPC-A</label>
+	<label><input name="code" type="checkbox" value="ean13" />EAN-13</label>
+	<label><input name="code" type="checkbox" value="i25" />I25</label>
+	<label><input name="code" type="checkbox" value="code39" />Code39</label>
+	<label><input name="code" type="checkbox" value="code128" />Code128</label>
+	<label><input name="code" type="checkbox" value="qr" />QR</label>
+	<label><input name="code" type="checkbox" value="dmtx" />Data Matrix</label>
+	</div>
+	<br/>
+
+	<div id ="div_select">
+	<strong class="char">配置参数：</strong>
+	</div>
+	<table id ="form" border="1">
+	<tr>
+	<th>码制选择</th>
+	<th>参数名</th>
+	<th>参数值</th>
+	<th><div title="请选择选项操作删除">选择</div></th>
+	</tr>
+	<tr name="row1" id="row1">
+	<td class = "code1">
+		<select  name="Codesystem" onchange="RunModeChangle()">
+		<option>请选择<b class="caret"></b></option>
+		<option value="39">EAN-8</option>
+		<option value="CE">UPC-E</option>
+		<option value="CA">UPC-A</option>
+		<option value="13">EAN-13</option>
+		<option value="25">I25</option>
+		<option value="39">Code39</option>
+		<option value="28">Code128</option>
+		<option value="QR">QR</option>
+		<option value="DM">Data Matrix</option>
+		</select>
+	</td>
+	<!-- 参数名 -->
+	<td class = "code1">
+		<select  name="parametervalue" onchang="">
+		<option value="QR">QR</option>
+		<option value="DM">Data Matrix</option>
+		<option value="CE">UPC-E</option>
+		<option value="CA">UPC-A</option>
+		<option value="13">EAN-13</option>
+		<option value="39">EAN-8</option>
+		<option value="25">I25</option>
+		<option value="39">Code39</option>
+		<option value="28">Code128</option>
+		</select>
+	</td>
+	<!-- 参数值 -->
+	<td class = "code1">
+		<select  name="parametertext" onchang="">
+		<option value="QR">QR</option>
+		<option value="DM">Data Matrix</option>
+		<option value="CE">UPC-E</option>
+		<option value="CA">UPC-A</option>
+		<option value="13">EAN-13</option>
+		<option value="39">EAN-8</option>
+		<option value="25">I25</option>
+		<option value="39">Code39</option>
+		<option value="28">Code128</option>
+		</select>
+	</td>
+	
+	<!--
+	<td class= "name"><input name="parametervalue" type="text" size="31" value="" /></td>
+	<td class= "name"><input name="parametertext" type="text" size="31" value="" /></td>
+	-->
+	<td class=""/> <label><input type="checkbox"  name="ck" value="1" /></label></td>
+	</tr>
+	</table>
+	<br/>
+    <div id="buttonBox">
+    	<input type="button" class="className" align="center" value="新增"   onclick="addRow()"/>
+    	<input type="button" class="className" align="center" value="全选"   onclick="selection()"/>
+    	<input type="button" class="className" align="center" value="删除"   onclick="deletes()"/>
+    </div>
+    <br/>
+    <br/>
+    <div id="Textpagram">
+        <textarea rows="5" cols="90">
+操作简要说明：
+    1、点击“新增”，增加一样参数，选择码制，输入参数名和参数值; 点击“全选”，选中所有的行; 选中若干行，点击“删除”。
+    2、修改完成后点击左侧“保存”，相关配置保存后生效。
+        </textarea>
+
+    </div>
+</div>
+
+</body>
+</html>
